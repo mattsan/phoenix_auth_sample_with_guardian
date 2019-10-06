@@ -6,9 +6,9 @@ defmodule Sample.AccountsTest do
   describe "users" do
     alias Sample.Accounts.User
 
-    @valid_attrs %{password_hash: "some password_hash", username: "some username"}
-    @update_attrs %{password_hash: "some updated password_hash", username: "some updated username"}
-    @invalid_attrs %{password_hash: nil, username: nil}
+    @valid_attrs %{password: "some password", username: "some username"}
+    @update_attrs %{password: "some updated password", username: "some updated username"}
+    @invalid_attrs %{password: nil, username: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -21,17 +21,21 @@ defmodule Sample.AccountsTest do
 
     test "list_users/0 returns all users" do
       user = user_fixture()
-      assert Accounts.list_users() == [user]
+      [stored_user] = Accounts.list_users()
+      assert stored_user.username == user.username
+      assert stored_user.password_hash == user.password_hash
     end
 
     test "get_user!/1 returns the user with given id" do
       user = user_fixture()
-      assert Accounts.get_user!(user.id) == user
+      stored_user = Accounts.get_user!(user.id)
+      assert stored_user.username == user.username
+      assert stored_user.password_hash == user.password_hash
     end
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.password_hash == "some password_hash"
+      assert user.password == "some password"
       assert user.username == "some username"
     end
 
@@ -42,14 +46,16 @@ defmodule Sample.AccountsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.password_hash == "some updated password_hash"
+      assert user.password == "some updated password"
       assert user.username == "some updated username"
     end
 
     test "update_user/2 with invalid data returns error changeset" do
       user = user_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user == Accounts.get_user!(user.id)
+      stored_user = Accounts.get_user!(user.id)
+      assert user.username == stored_user.username
+      assert user.password_hash == stored_user.password_hash
     end
 
     test "delete_user/1 deletes the user" do
