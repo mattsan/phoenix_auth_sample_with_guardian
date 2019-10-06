@@ -101,4 +101,21 @@ defmodule Sample.Accounts do
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+
+  def authenticate_user(username, password) do
+    query = from u in User, where: u.username == ^username
+    user = Repo.one(query)
+
+    cond do
+      user && Argon2.verify_pass(password, user.password_hash) ->
+        {:ok, user}
+
+      user ->
+        Argon2.no_user_verify()
+        {:error, :invalid_credential}
+
+      true ->
+        {:error, :invalid_credential}
+    end
+  end
 end

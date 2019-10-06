@@ -68,5 +68,22 @@ defmodule Sample.AccountsTest do
       user = user_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
+
+    test "authenticate_user/2 with valid username/passowrd pair" do
+      user = user_fixture()
+      assert {:ok, stored_user} = Accounts.authenticate_user(user.username, "some password")
+      assert stored_user.username == user.username
+      assert stored_user.password_hash == user.password_hash
+    end
+
+    test "authenticate_user/2 with an invalid passowrd" do
+      user = user_fixture()
+      assert {:error, :invalid_credential} == Accounts.authenticate_user(user.username, "invalid password")
+    end
+
+    test "authenticate_user/2 with an invalid username" do
+      user_fixture()
+      assert {:error, :invalid_credential} == Accounts.authenticate_user("invalid username", "some password")
+    end
   end
 end
