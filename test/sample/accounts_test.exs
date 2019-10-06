@@ -85,5 +85,17 @@ defmodule Sample.AccountsTest do
       user_fixture()
       assert {:error, :invalid_credential} == Accounts.authenticate_user("invalid username", "some password")
     end
+
+    test "get_user_by/1 with a valid parameter" do
+      user = user_fixture()
+      stored_user = Accounts.get_user_by(username: user.username)
+      assert user.username == stored_user.username
+      assert user.password_hash == stored_user.password_hash
+    end
+
+    test "get_user_by/1 with an invalid parameter" do
+      user_fixture()
+      assert nil == Accounts.get_user_by(username: "invalid username")
+    end
   end
 end

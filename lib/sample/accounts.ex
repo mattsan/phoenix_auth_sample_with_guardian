@@ -118,4 +118,6 @@ defmodule Sample.Accounts do
         {:error, :invalid_credential}
     end
   end
+
+  def get_user_by(params), do: Repo.get_by(User, params)
 end
