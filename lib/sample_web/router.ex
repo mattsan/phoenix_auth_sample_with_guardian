@@ -13,12 +13,27 @@ defmodule SampleWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug SampleWeb.Pipeline
+  end
+
+  pipeline :ensure_auth do
+    plug Guardian.Plug.EnsureAuthenticated
+  end
+
   scope "/", SampleWeb do
-    pipe_through :browser
+    pipe_through [:browser, :auth]
 
     get "/", PageController, :index
+    get "/login", SessionController, :new
+    post "/login", SessionController, :login
+  end
+
+  scope "/", SampleWeb do
+    pipe_through [:browser, :auth, :ensure_auth]
 
     resources "/users", UserController, only: [:index]
+    delete "/logout", SessionController, :logout
   end
 
   # Other scopes may use custom stacks.
