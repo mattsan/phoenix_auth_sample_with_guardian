@@ -17,6 +17,10 @@ config :sample, SampleWeb.Endpoint,
   render_errors: [view: SampleWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Sample.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :sample, SampleWeb.Guardian,
+  issuer: "sample",
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
